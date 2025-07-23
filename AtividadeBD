@@ -1,0 +1,142 @@
+-- Tabela Cliente
+CREATE TABLE Cliente (
+  codCli INT PRIMARY KEY,
+  nome_C VARCHAR(50) NOT NULL,
+  telefone_C VARCHAR(18) NOT NULL,
+  endereco_C VARCHAR(100) NOT NULL,
+  CPF_C VARCHAR(18) NOT NULL,
+  email_C VARCHAR(50) NOT NULL
+);
+
+INSERT INTO Cliente VALUES
+(1, 'Lucas', '73901648392', 'Rua da Pimenta', '11820083682', 'lucas@gmail.com'),
+(2, 'Maria Luiza', '948502715489', 'Rua do Sol', '73749100572', 'maria.luiza@gmail.com'),
+(3, 'Carla', '84925184990', 'Belo Monte', '773920618481', 'carla@gmail.com');
+
+-- Tabela Vendedor
+CREATE TABLE Vendedor (
+  codVdd INT PRIMARY KEY,
+  CPF_V VARCHAR(19) NOT NULL,
+  nome_V VARCHAR(50) NOT NULL,
+  telefone_V VARCHAR(19) NOT NULL
+);
+
+INSERT INTO Vendedor VALUES 
+(1, '37849013685', 'Joana Monte', '63813649100'),
+(2, '36466881019', 'Luis Messias', '74899142675'),
+(3, '88642601457', 'Julia', '98637133290');
+
+-- Tabela Produto
+CREATE TABLE Produto (
+  codPro INT PRIMARY KEY,
+  nome_P VARCHAR(50) NOT NULL,
+  preco_P DECIMAL(11,2) NOT NULL,
+  estoque_P INT NOT NULL
+);
+
+INSERT INTO Produto VALUES
+(1, 'Mesa', 369.00, 100),
+(2, 'Cadeira', 202.00, 50),
+(3, 'Fogao', 3500.00, 10);
+
+-- Tabela Venda
+CREATE TABLE Venda (
+  Numero_VEN INT PRIMARY KEY,
+  codVdd INT NOT NULL,
+  codCli INT NOT NULL,
+  FOREIGN KEY (codVdd) REFERENCES Vendedor(codVdd),
+  FOREIGN KEY (codCli) REFERENCES Cliente(codCli)
+);
+
+INSERT INTO Venda VALUES 
+(3, 1, 1),
+(4, 3, 2),
+(5, 2, 3);
+
+-- Tabela Item_Venda
+CREATE TABLE Item_Venda (
+  Numero_VEN INT NOT NULL,
+  codPro INT NOT NULL,
+  ValorUni_IV DECIMAL(10,2) NOT NULL,
+  Qtd INT NOT NULL,
+  PRIMARY KEY (Numero_VEN, codPro),
+  FOREIGN KEY (Numero_VEN) REFERENCES Venda(Numero_VEN),
+  FOREIGN KEY (codPro) REFERENCES Produto(codPro)
+);
+
+INSERT INTO Item_Venda VALUES
+(3, 3, 3500.00, 4),
+(4, 1, 369.00, 1),
+(5, 2, 202.00, 10);
+
+-- Tabela Motorista
+CREATE TABLE Motorista (
+  CodMot INT PRIMARY KEY,
+  nome_M VARCHAR(50) NOT NULL,
+  CPF_M VARCHAR(11) NOT NULL,
+  CNH_M VARCHAR(11) NOT NULL,
+  endereco_M VARCHAR(100) NOT NULL 
+);
+
+INSERT INTO Motorista VALUES
+(1, 'Paulo', '18293740293', '2637819027', 'Aurora'), 
+(2, 'Vanessa', '22738940172', '2637849103', 'Avenida Paulista'),
+(3, 'Sanji', '83919201000', '28838000010', 'All Blue');
+
+-- Tabela Veiculo
+CREATE TABLE Veiculo (
+  placa_VEI VARCHAR(10) PRIMARY KEY,
+  capacidade_VEI INT NOT NULL 
+);
+
+INSERT INTO Veiculo VALUES 
+('AN39D01', 4000),
+('SNWI8291', 5000),
+('284NS7H', 1000);
+
+-- Tabela Entrega
+CREATE TABLE Entrega (
+  Hora_E TIME NOT NULL,
+  Data_E DATE NOT NULL,
+  Numero_VEN INT NOT NULL,
+  placa_VEI VARCHAR(10) NOT NULL,
+  CodMot INT NOT NULL, 
+  PRIMARY KEY (Hora_E, Data_E),
+  FOREIGN KEY (Numero_VEN) REFERENCES Venda(Numero_VEN),
+  FOREIGN KEY (placa_VEI) REFERENCES Veiculo(placa_VEI),
+  FOREIGN KEY (CodMot) REFERENCES Motorista(CodMot)
+);
+
+INSERT INTO Entrega VALUES
+('15:29:00', '2019-09-19', 3, 'AN39D01', 1),
+('20:29:19', '2039-10-13', 4, '284NS7H', 2),
+('18:00:00', '2007-06-19', 5, 'SNWI8291', 3);
+
+-- Consulta 1
+SELECT C.nome_C, V.nome_V, VD.Numero_VEN
+FROM Venda VD
+JOIN Cliente C ON VD.codCli = C.codCli
+JOIN Vendedor V ON VD.codVdd = V.codVdd;
+
+-- Consulta 2
+SELECT VD.Numero_VEN, P.nome_P, Q.Qtd 
+FROM Venda VD
+LEFT JOIN Item_Venda Q ON VD.Numero_VEN = Q.Numero_VEN
+LEFT JOIN Produto P ON Q.codPro = P.codPro;
+
+-- Consulta 3
+SELECT C.nome_C, V.nome_V, VD.Numero_VEN
+FROM Vendedor V
+RIGHT JOIN Venda VD ON V.codVdd = VD.codVdd
+RIGHT JOIN Cliente C ON VD.codCli = C.codCli;
+
+-- Consulta 4
+SELECT C.nome_C, V.Numero_VEN
+FROM Cliente C
+LEFT JOIN Venda V ON C.codCli = V.codCli
+
+UNION
+
+SELECT C.nome_C, V.Numero_VEN
+FROM Cliente C
+RIGHT JOIN Venda V ON C.codCli = V.codCli;
