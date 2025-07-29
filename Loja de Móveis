@@ -1,0 +1,212 @@
+-- Tabela Cliente
+CREATE TABLE Clientes (
+  codCli INT PRIMARY KEY,
+  nome_C VARCHAR(50),
+  telefone_C VARCHAR(18),
+  endereco_C VARCHAR(100),
+  CPF_C VARCHAR(18),
+  email_C VARCHAR(50)
+);
+
+INSERT INTO Clientes VALUES
+(1, 'Lucas', '73901648392', 'Rua da Pimenta', '11820083682', 'lucas@gmail.com'),
+(2, 'Maria Luiza', '948502715489', 'Rua do Sol', '73749100572', 'maria.luiza@gmail.com'),
+(3, 'Carla', '84925184990', 'Belo Monte', '773920618481', 'carla@gmail.com'),
+(4, 'Paulo', '29304728192', 'Chyv', '883929173647', 'paullo@gmai.out');
+
+-- Tabela Vendedor
+CREATE TABLE Vendedor (
+  codVdd INT PRIMARY KEY,
+  CPF_V VARCHAR(19),
+  nome_V VARCHAR(50),
+  telefone_V VARCHAR(19)
+);
+
+INSERT INTO Vendedor VALUES
+(1, '37849013685', 'Joana Monte', '63813649100'),
+(2, '36466881019', 'Luis Messias', '74899142675'),
+(3, '88642601457', 'Julia', '98637133290'),
+(4, '66390217648', 'Kamyla Fushikoke', '9837562619');
+
+-- Tabela Produto
+CREATE TABLE Produto (
+  codPro INT PRIMARY KEY,
+  nome_P VARCHAR(50),
+  preco_P numeric(11,2),
+  estoque_P INT 
+);
+
+INSERT INTO Produto VALUES
+(1, 'Mesa', 369.00, 100),
+(2, 'Cadeira', 202.00, 50),
+(3, 'Fogao', 3500.00, 10),
+(4, 'Panela', 500.00, 1);
+
+-- Tabela Venda
+CREATE TABLE Venda (
+  Numero_VEN INT PRIMARY KEY,
+  codVdd INT,
+  codCli INT,
+  FOREIGN KEY (codVdd) REFERENCES Vendedor(codVdd),
+  FOREIGN KEY (codCli) REFERENCES Clientes(codCli)
+);
+
+INSERT INTO Venda VALUES
+(3, 1, 1),
+(4, 3, 1),
+(5, 2, 3),
+(2, 2, 1),
+(1, 2, 2);
+
+-- Tabela Item_Venda
+CREATE TABLE Item_Venda (
+  Numero_VEN INT,
+  codPro INT,
+  ValorUni_IV numeric(11,2),
+  Qtd INT,
+  PRIMARY KEY (Numero_VEN, codPro),
+  FOREIGN KEY (Numero_VEN) REFERENCES Venda(Numero_VEN),
+  FOREIGN KEY (codPro) REFERENCES Produto(codPro)
+);
+
+INSERT INTO Item_Venda VALUES
+(3, 3, 3500.00, 4),
+(4, 1, 369.00, 1),
+(5, 2, 202.00, 10),
+(2, 3, 387.88, 0);
+
+-- Tabela Motorista
+CREATE TABLE Motorista (
+  CodMot INT PRIMARY KEY,
+  nome_M VARCHAR(50),
+  CPF_M VARCHAR(11),
+  CNH_M VARCHAR(11),
+  endereco_M VARCHAR(100)
+);
+
+INSERT INTO Motorista VALUES
+(1, 'Paulo', '18293740293', '2637819027', 'Aurora'),
+(2, 'Vanessa', '22738940172', '2637849103', 'Avenida Paulista'),
+(3, 'Sanji', '83919201000', '28838000010', 'All Blue'),
+(4, 'Rosa Marley', '78905432759', '72930762892', 'Tokyo');
+
+-- Tabela Veiculo
+CREATE TABLE Veiculo (
+  placa_VEI VARCHAR(10) PRIMARY KEY,
+  capacidade_VEI INT
+);
+
+INSERT INTO Veiculo VALUES
+('AN39D01', 4000),
+('SNWI8291', 5000),
+('284NS7H', 1000),
+('JFN3829', 3992);
+
+-- Tabela Entrega
+CREATE TABLE Entrega (
+  Hora_E TIME,
+  Data_E DATE,
+  Numero_VEN INT,
+  placa_VEI VARCHAR(10),
+  CodMot INT,
+  PRIMARY KEY (Hora_E, Data_E),
+  FOREIGN KEY (Numero_VEN) REFERENCES Venda(Numero_VEN),
+  FOREIGN KEY (placa_VEI) REFERENCES Veiculo(placa_VEI),
+  FOREIGN KEY (CodMot) REFERENCES Motorista(CodMot)
+);
+
+INSERT INTO Entrega VALUES
+('15:29:00', '2019-09-19', 3, 'AN39D01', 1),
+('20:29:19', '2039-10-13', 4, '284NS7H', 2),
+('18:00:00', '2007-06-19', 5, 'SNWI8291', 4),
+('15:00:00', '2020-03-27', 3, 'JFN3829', 3);
+
+SELECT * FROM Clientes;
+SELECT * from Vendedor;
+SELECT * FROM Produto;
+SELECT * FROM Venda;
+SELECT * FROM Item_Venda;
+SELECT * FROM Motorista;
+SELECT * FROM Veiculo;
+SELECT * FROM Entrega;
+
+-- Consulta 1: para listar vendedores e suas vendas
+SELECT VD.nome_V as vendedor, V.Numero_VEN as vendas
+FROM Vendedor VD
+JOIN Venda V ON VD.codVdd = V.codVdd;
+
+-- Consulta 2: para mostrar a quantidade de venda de cada vendedor
+SELECT V.nome_V AS vendedor,
+       COUNT(VD.Numero_VEN) as quantidade
+from Vendedor V
+left join Venda VD ON V.codVdd = VD.codVdd
+GROUP BY V.codVdd, V.nome_V;
+
+-- Consulta 3: para mostrar a entrega de cada produto
+select P.nome_P AS produto, E.Hora_E AS horario, E.Data_E AS data 
+FROM Produto P
+JOIN Item_Venda I ON P.codPro = I.codPro
+JOIN Venda V ON I.Numero_VEN = V.Numero_VEN
+JOIN Entrega E ON V.Numero_VEN = E.Numero_VEN;
+
+-- Consulta 4: mostrar o veiculo de cada Motorista
+SELECT M.nome_M AS Motorista, E.placa_VEI AS veiculo
+FROM Motorista M
+join Entrega E ON M.CodMot = E.CodMot;
+
+-- consulta 5: mostar o produto de cada venda 
+select  P.nome_P AS "compra", V.Numero_VEN as venda
+From Venda V
+JOIN Item_Venda I ON  V.Numero_VEN = I.Numero_VEN
+join Produto P ON I.codPro = P.codPro;
+
+
+-- consulta 6: Mostrar o cliente e o total de compra realizada por ele
+SELECT  C.nome_C as cliente,
+  SUM(I.ValorUni_IV * I.Qtd) AS "total das compras"
+FROM Clientes C
+JOIN Venda V ON C.codCli = V.codCli
+join Item_Venda I on V.Numero_VEN = I.Numero_VEN
+GROUP BY C.nome_C ORDER BY  "total das compras" desc;
+
+-- consulta 7: produto de cada cliente 
+select  C.nome_C as cliente, P.nome_P as produto
+from Clientes C 
+join Venda V ON C.codCli = V.codCli
+JOIN Item_Venda I ON V.Numero_VEN = I.Numero_VEN
+JOIN Produto P ON I.codPro = P.codPro
+ORDER BY C.nome_C;
+
+-- consulta 8: a hora da entrega de cada motorista
+select M.nome_M as motorista, E.Hora_E as "hora da entrega"
+from Motorista M
+left join Entrega E ON M.CodMot = E.CodMot; 
+
+-- consulta 9: vendedor e a media de vendas
+select VDD.nome_V as vendedor, 
+  AVG(I.ValorUni_IV * I.Qtd) AS "total de vendas"
+from Vendedor VDD
+JOIN Venda V ON VDD.codVdd = V.codVdd
+JOIN Item_Venda I ON V.Numero_VEN = I.Numero_VEN
+GROUP BY VDD.nome_V;
+
+-- consulta 10: produtos que nao foram vendidos 
+select P.nome_P as produtos
+from Produto P 
+LEFT join Item_Venda I on P.codPro = I.codPro
+WHERE I.codPro IS NULL;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
