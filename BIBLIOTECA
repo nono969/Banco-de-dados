@@ -1,0 +1,155 @@
+CREATE TABLE alunos (
+aluno_id INT PRIMARY KEY,
+nome VARCHAR(100),
+curso VARCHAR(100)
+);
+INSERT INTO alunos VALUES
+(1, 'Rhilary Santiago', 'Fisioterapia'),
+(2, 'Gabriela', 'Letras'),
+(3, 'Isabelly', 'Farmacia'),
+(4, 'Kamyla', 'Direito'),
+(6, 'Sanji', 'Culinaria'),
+(7, 'Zoro', 'Educação Fisica'),
+(8, 'Nami', 'Geografia'),
+(9, 'Chopper', 'Medicina'),
+(10, 'Luffy', 'Turismo'),
+(11, 'Franky', 'Engenharia'),
+(12, 'Robin', 'Historia');
+
+
+CREATE TABLE livros (
+livro_id INT PRIMARY KEY,
+titulo VARCHAR(150),
+autor VARCHAR(100),
+categoria VARCHAR(50)
+);
+INSERT INTO livros VALUES 
+(1, 'Dom Casmurro', 'Machado de Assis', 'Romance'),
+(2, 'O Pequeno Príncipe', 'Antoine de Saint-Exupéry', 'Fábula'),
+(3, '1984', 'George Orwell', 'Distopia'),
+(4, 'Capitães da Areia', 'Jorge Amado', 'Romance'),
+(5, 'A Revolução dos Bichos', 'George Orwell', 'Satírica'),
+(6, 'O Alquimista', 'Paulo Coelho', 'Ficção'),
+(7, 'Harry Potter e a Pedra Filosofal', 'J.K. Rowling', 'Fantasia'),
+(8, 'O Hobbit', 'J.R.R. Tolkien', 'Fantasia'),
+(9, 'A Menina que Roubava Livros', 'Markus Zusak', 'Drama'),
+(10, 'Orgulho e Preconceito', 'Jane Austen', 'Romance'),
+(11, 'O Código Da Vinci', 'Dan Brown', 'Suspense'),
+(12, 'A Culpa é das Estrelas', 'John Green', 'Drama'),
+(13, 'O Senhor dos Anéis', 'J.R.R. Tolkien', 'Fantasia'),
+(14, 'Cem Anos de Solidão', 'Gabriel García Márquez', 'Realismo Mágico'),
+(15, 'A Cabana', 'William P. Young', 'Religioso'),
+(16, 'Romeu e Julieta', 'William Shakespeare', 'Tragédia'),
+(17, 'O Diário de Anne Frank', 'Anne Frank', 'Biografia'),
+(18, 'It: A Coisa', 'Stephen King', 'Terror'),
+(19, 'O Nome do Vento', 'Patrick Rothfuss', 'Fantasia'),
+(20, 'Pequenas Grandes Mentiras', 'Liane Moriarty', 'Mistério');
+
+
+CREATE TABLE emprestimos (
+id INT PRIMARY KEY,
+aluno_id INT,
+livro_id INT,
+data_emprestimo DATE,
+data_devolucao DATE,
+FOREIGN KEY (aluno_id) REFERENCES alunos(aluno_id),
+FOREIGN KEY (livro_id) REFERENCES livros(livro_id)
+);
+INSERT INTO emprestimos VALUES 
+(1, 6, 18, '2019-09-19', '2019-10-19'),
+(2, 9, 1, '2020-01-20', '2020-02-20'),
+(3, 2, 19, '2020-08-03', '2020-09-03'),
+(4, 12, 20, '2019-09-19', NULL),
+(5, 4, 5, '2021-07-21', '2021-08-21'),
+(6, 10, 4, '2019-09-19', '2019-10-19'),
+(7, 12, 2, '2020-02-28', '2020-03-28'),
+(8, 7, 8, '2010-05-19', '2010-06-19'),
+(9, 4, 18, '2019-10-20', '2020-11-20'),
+(10, 12, 9, '2021-07-21', '2021-08-21');
+
+SELECT * FROM alunos;
+SELECT * FROM livros;
+SELECT * FROM emprestimos;
+
+
+--Consultas---
+--1.0 nome dos alunos e a quantidade total de livros emprestados
+SELECT A.nome as aluno, 
+     COUNT(A.aluno_id * E.aluno_id) as "livros emprestados"
+FROM alunos A
+LEFT JOIN emprestimos E ON A.aluno_id = E.aluno_id
+GROUP BY A.nome ORDER BY "livros emprestados" desc;
+
+--2.LISTE OS LIVROS MAIS EMPRESTADOS ORDER BY DESC
+SELECT L.titulo as titulo, 
+    count(E.id) as "emprestimos"
+from livros L
+JOIN emprestimos E ON L.livro_id = E.livro_id
+group by L.titulo order by "emprestimos" desc;
+
+--3.cada curso mostra a qtd total de livros por seus alunos
+SELECT A.curso as curso,
+    COUNT(E.id) AS "total_emprestimo"
+from alunos A
+LEFT JOIN emprestimos E ON A.aluno_id = E.aluno_id
+GROUP BY A.curso order by "total_emprestimo" desc;
+
+--4.ALUNO QUE MAIS EMPRESTOU livros
+SELECT A.nome AS aluna,
+    COUNT(E.id) AS "quantidade de livros emprestados"
+from alunos A 
+JOIN emprestimos E on A.aluno_id = E.aluno_id
+GROUP BY A.nome ORDER BY "quantidade de livros emprestados" DESC limit 1;
+
+--5.LIVROS QUE NAO FORAM DEVOLVIDOS (data_devolucao is null)
+SELECT L.titulo AS livro
+from livros L 
+join emprestimos E on L.livro_id = E.livro_id
+WHERE E.data_devolucao IS NULL;
+
+--6.media dos livros emprestados por aluno
+select A.nome as aluno,
+    avg(E.data_emprestimo * E.livro_id) AS "MEDIA DOS LIVROS"
+fROM alunos A 
+JOIN emprestimos E on A.aluno_id = E.aluno_id
+join livros L on E.livro_id = L.livro_id
+group by A.nome;
+
+
+--7.LIVROS MAIS POPULARES (CATEGORIA)
+select L.categoria,
+    count(E.id) as "emprestimos"
+from livros L 
+join emprestimos E on L.livro_id = E.livro_id
+GROUP BY L.categoria ORDER BY "emprestimos" DESC;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
