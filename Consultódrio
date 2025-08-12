@@ -1,0 +1,78 @@
+CREATE TABLE Ambulatorios (
+  nroa INT PRIMARY KEY,
+  andar INT,
+  capacidade INT
+);
+
+INSERT INTO Ambulatorios (nroa, andar, capacidade) VALUES
+(1, 1, 20),
+(2, 1, 15),
+(3, 2, 25),
+(4, 3, 30),
+(5, 3, 18);
+
+CREATE TABLE Medicos (
+  codm INT PRIMARY KEY,
+  nroa INT,
+  CPF_M VARCHAR(15),
+  nome_M VARCHAR(100),
+  idade_M INT,
+  cidade_M VARCHAR(100),
+  especialidade VARCHAR(100),
+  FOREIGN KEY (nroa) REFERENCES Ambulatorios (nroa)
+);
+
+INSERT INTO Medicos (codm, nroa, CPF_M, nome_M, idade_M, cidade_M, especialidade) VALUES
+(1, 1, '123.456.789-01', 'Dr. Carlos Almeida', 45, 'Salvador', 'Cardiologia'),
+(2, 5, '234.567.890-12', 'Dra. Marbelly Dias', 38, 'Feira de Santana', 'Pediatria'),
+(3, 3, '345.678.901-23', 'Dra. Kamylla Felix', 50, 'Salvador', 'Odontologia'),
+(4, 4, '456.789.012-34', 'Dra. Gabriela Vinsmoke', 42, 'Itabuna', 'Dermatologia'),
+(5, 2, '567.890.123-45', 'Dra. Rhilary Santiago', 37, 'Vitória da Conquista', 'Neurologia');
+
+CREATE TABLE Pacientes (
+  codp INT PRIMARY KEY,
+  CPF_P VARCHAR(15),
+  nome_P VARCHAR(100),
+  idade_P INT,
+  cidade_P VARCHAR(100),
+  doenca VARCHAR(60)
+);
+
+INSERT INTO Pacientes (codp, CPF_P, nome_P, idade_P, cidade_P, doenca) VALUES
+(1, '11122233344', 'Marcos Silva', 98, 'Salvador', 'Gripe'),
+(2, '22233344455', 'Luciana Costa', 34, 'Guarabira', 'Diabetes'),
+(3, '33344455566', 'Rafael Santos', 15, 'Itabuna', 'Fratura no braço'),
+(4, '44455566677', 'Patrícia Oliveira', 45, 'Vitória da Conquista', 'Hipertensão'),
+(5, '55566677788', 'Gustavo Pereira', 52, 'Pilões', 'Bronquite');
+
+CREATE TABLE Consultas (
+  codm INT,
+  codp INT,
+  data DATE,
+  hora TIME, 
+  FOREIGN KEY (codm) REFERENCES Medicos (codm),
+  FOREIGN KEY (codp) REFERENCES Pacientes (codp)
+);
+
+INSERT INTO Consultas (codm, codp, data, hora) VALUES
+(1, 2, '2040-09-12', '06:30:50'),
+(2, 1, '2045-12-03', '16:00:05'),
+(3, 3, '2043-03-03', '15:15:03'),
+(4, 5, '2040-10-06', '18:28:10'),
+(4, 4, '2040-02-19', '20:02:01');
+
+SELECT * FROM Ambulatorios;
+SELECT * FROM Medicos;
+SELECT * FROM Pacientes;
+SELECT * FROM Consultas;
+
+--consultas
+
+
+
+
+
+
+
+
+
