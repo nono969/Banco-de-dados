@@ -25,7 +25,7 @@ CREATE TABLE Medicos (
 INSERT INTO Medicos (codm, nroa, CPF_M, nome_M, idade_M, cidade_M, especialidade) VALUES
 (1, 1, '123.456.789-01', 'Dr. Carlos Almeida', 45, 'Salvador', 'Cardiologia'),
 (2, 5, '234.567.890-12', 'Dra. Marbelly Dias', 38, 'Feira de Santana', 'Pediatria'),
-(3, 3, '345.678.901-23', 'Dra. Kamylla Felix', 50, 'Salvador', 'Odontologia'),
+(3, 3, '345.678.901-23', 'Dra. Kamyla Felix', 50, 'Salvador', 'Odontologia'),
 (4, 4, '456.789.012-34', 'Dra. Gabriela Vinsmoke', 42, 'Itabuna', 'Dermatologia'),
 (5, 2, '567.890.123-45', 'Dra. Rhilary Santiago', 37, 'Vitória da Conquista', 'Neurologia');
 
@@ -70,7 +70,7 @@ SELECT * FROM Consultas;
 create view medicos_cosultas as 
 select M.nome_M as medicos, P.nome_P as pacientes, C.hora as consultas
 from Medicos M
-left join Consultas C  on M.codm = C.codm
+LEFT join Consultas C  on M.codm = C.codm
 JOIN Pacientes P ON C.codp = P.codp;
 
 select * from medicos_cosultas;
@@ -84,15 +84,25 @@ JOIN Ambulatorios A on M.nroa = A.nroa;
 
 select * from consulta_ambulatorio;
 
+--CONSULTA 3 Todos os nomes dos médicos (até os que não tem consultas) e a data e a hora da consulta
+CREATE VIEW medicos_consultas as
+select M.nome_M as medicos, C.hora as hora, C.data as data
+from Medicos M
+left join Consultas C on M.codm = C.codm;
 
---consulta 4
+SELECT * FROM medicos_consultas;
+
+--consulta 4 A idade dos pacientes, doença, nome dos médicos e o código dos ambulatódrios.
 create view pacientes_medicos as
 select 
-P.idade_P as Pacientes, P.doenca as Pacientes,
-M.nome_M AS Medicos, A,nroa AS Ambulatorios
-FROM 
+P.idade_P as pacientes, P.doenca,
+M.nome_M AS Medicos, A.nroa AS Ambulatorios
+FROM Consultas C
+JOIN Medicos M on C.codm = M.codm
+join Pacientes P on C.codp = P.codp
+join Ambulatorios A ON M.nroa = A.nroa;
 
-
+select * FROM pacientes_medicos;
 
 
 
