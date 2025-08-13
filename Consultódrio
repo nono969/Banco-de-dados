@@ -66,7 +66,43 @@ SELECT * FROM Medicos;
 SELECT * FROM Pacientes;
 SELECT * FROM Consultas;
 
---consultas
+--consultas 1
+create view medicos_cosultas as 
+select M.nome_M as medicos, P.nome_P as pacientes, C.hora as consultas
+from Medicos M
+left join Consultas C  on M.codm = C.codm
+JOIN Pacientes P ON C.codp = P.codp;
+
+select * from medicos_cosultas;
+
+--consultas 2
+create view consulta_ambulatorio as
+select C.hora as consultas, A.andar as Ambulatorios, M.codm as Medicos
+from Consultas C
+JOIN Medicos M ON C.codm = M.codm
+JOIN Ambulatorios A on M.nroa = A.nroa;
+
+select * from consulta_ambulatorio;
+
+
+--consulta 4
+create view pacientes_medicos as
+select 
+P.idade_P as Pacientes, P.doenca as Pacientes,
+M.nome_M AS Medicos, A,nroa AS Ambulatorios
+FROM 
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
