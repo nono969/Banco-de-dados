@@ -31,7 +31,7 @@ insert into Veiculo(id_veiculo, modelo, marca, ano, categoria, preco_diaria, dis
 (11, 'Jetta', 'Volkswagen', '1990', 'SUV', '701920', true),
 (12, 'Abarth 500', 'Abarth', '2024', 'Cabrio', '790090', true),
 (13, 'Alfa romeo Junior', 'Alfa-romeo', '2020', 'SUV', '10000', true),
-(15, 'AudiA6 E-Tron', 'Audi', '2024', 'Hacthback', '649990', false),
+(15, 'AudiA6 E-Tron', 'Audi', '2024', 'Cabrio', '649990', false),
 (16, 'JEEP Avenger', 'JEEP', '2022', 'SUV', '189990', false),
 (17, 'Cupra Leon', 'Cupra', '2024', 'Hacthback', '50341', true);
 
@@ -47,7 +47,7 @@ insert into Aluguel(id_aluguel, id_cliente, id_veiculo, data_inicio, data_fim, v
 (1, 4, 13, '2040-09-12', '2040-10-12', '400900'),
 (2, 6, 15, '2045-12-03', '2045-12-04', '649990'),
 (3, 8, 11, '2020-12-01', '2025-03-19', '205595'),
-(4, 5, 16, '2020-02-01', '2020-03-01', '1899909'),
+(4, 5, 13, '2020-02-01', '2020-03-01', '1899909'),
 (5, 1, 17, '2020-02-02', '2020-03-02', '18990990');
 
 select * from Veiculo;
@@ -104,12 +104,82 @@ from Aluguel A;
 SELECT * FROM ValorTotal_Alugueis;
 
 --consulta 6: Mostre o número de veículos alugados por categoria (SUV, Sedan, etc.).
+create view Veiculos_Categorias AS
+select count(*) as qtd_alugados, V.categoria as categoria
+from Veiculo V
+JOIN Aluguel A on V.id_veiculo = A.id_veiculo
+group by V.categoria;
+
+select * from Veiculos_Categorias;
+
 --consulta 7: Liste os 5 clientes que mais gastaram em aluguéis.
+create view Cliente_Gastaram as
+select C.nome as cliente, SUM(A.valor_total) as total_alugados
+from Cliente C
+JOIN Aluguel A on C.id_cliente = A.id_cliente
+group by C.nome
+order by total_alugados desc limit 5;
+
+select * from Cliente_Gastaram;
+
 --consulta 8: Calcule a média de valor dos aluguéis por cliente.
+create view ClientesMedia_Alugueis as 
+select C.nome as clientes, avg(A.valor_total) AS media_clientes
+from Cliente C
+JOIN Aluguel A ON C.id_cliente = A.id_cliente
+GROUP BY C.nome
+order by media_clientes desc;
+
+SELECT * FROM ClientesMedia_Alugueis;
+
 --consulta 9: Liste o faturamento total por mês (ano/mês e soma de valor_total).
+create view faturamentoTotal_PorMes as 
+select to_char(A.data_inicio, 'YYYY-MM') AS ano_mes, sum(A.valor_total) AS faturamento_total
+from Aluguel A
+group by to_char(A.data_inicio, 'YYYY-MM')
+ORDER BY ano_mes;
+
+SELECT * FROM faturamentoTotal_PorMes;
+
 --consulta 10: Mostre: nome do cliente, modelo do veículo, período do aluguel e valor_total.
+create view quase_tudo AS
+select C.nome AS cliente, V.modelo, A.data_inicio, A.data_fim, A.valor_total
+FROM Cliente C
+JOIN Aluguel A ON C.id_cliente = A.id_cliente
+JOIN Veiculo V ON A.id_veiculo = V.id_veiculo;
 
+SELECT * FROM quase_tudo;
 
+--CONSULTA 11: Mostre o faturamento total por categoria de veículo.
+create view Faturamento_Veiculo AS
+select V.categoria, sum(A.valor_total) AS faturamento_total
+from Veiculo V 
+join Aluguel A ON V.id_veiculo = A.id_veiculo
+GROUP BY V.categoria
+ORDER BY faturamento_total DESC;
+
+SELECT * FROM Faturamento_Veiculo;
+
+--CONSULTA 12:Liste os clientes que já gastaram mais de R$ 5000,00 em aluguéis.
+create view GastaramMuita_grana AS
+select C.nome, sum(A.valor_total) AS gastos_alugeis
+from Cliente C
+JOIN Aluguel A ON C.id_cliente = A.id_cliente
+group by C.nome
+having SUM(A.valor_total) > 5000;
+
+SELECT * FROM GastaramMuita_grana
+ORDER BY gastos_alugeis DESC;
+
+--CONSULTA 13: Mostre os 3 veículos mais alugados.
+CREATE VIEW tresVeiculosMais_Alugadosss AS 
+select count(A.id_aluguel)  as qtde_alufueis, V.modelo
+from Veiculo V
+join Aluguel A on V.id_veiculo = A.id_veiculo
+group by V.modelo
+order by qtde_alufueis desc limit 3;
+
+select * from tresVeiculosMais_Alugadosss;
 
 
 
