@@ -5,7 +5,7 @@ curso VARCHAR(100)
 );
 INSERT INTO alunos VALUES
 (1, 'Rhilary Santiago', 'Fisioterapia'),
-(2, 'Gabriela', 'Letras'),
+(2, 'Gabriela', 'Ciência de Dados e IA'),
 (3, 'Isabelly', 'Farmacia'),
 (4, 'Kamyla', 'Direito'),
 (6, 'Sanji', 'Culinaria'),
@@ -122,6 +122,7 @@ select L.categoria,
 from livros L 
 join emprestimos E on L.livro_id = E.livro_id
 GROUP BY L.categoria ORDER BY "emprestimos" DESC;
+
 
 
 
